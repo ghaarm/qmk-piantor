@@ -4,6 +4,9 @@
 #include QMK_KEYBOARD_H
 #include  "keymap_german.h"
 
+// Globale Variablen für die Backspace-Wiederholung
+static bool backspace_active = false;  // Status der Backspace-Taste
+static uint16_t backspace_timer = 0;   // Timer für die Wiederholung
 
 enum layers {
     _BASE,
@@ -80,12 +83,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 return false;
 
             case MORPH_SS:
-                /* if (alt_held && shift_held) { */
-                /*     uint8_t mods = get_mods(); // Aktuelle Modifikatoren speichern */
-                /*     del_mods(MOD_BIT(KC_LALT)| MOD_BIT(KC_LSFT)); // Alt und Shift entfernen */
-                /*     tap_code16(S(DE_SS)); // Shift DE_ADIA -> Ä */
-                /*     set_mods(mods); // Modifikatoren wiederherstellen */
-                /* } else if (alt_held) { */
                 if (alt_held) {
                     uint8_t mods = get_mods(); // Aktuelle Modifikatoren speichern
                     del_mods(MOD_BIT(KC_LALT)| MOD_BIT(KC_LSFT)); // Alt und Shift entfernen
@@ -97,12 +94,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 return false;
 
             case MORPH_SPACE:
-                /* if (alt_held && shift_held) { */
-                /*     uint8_t mods = get_mods(); // Aktuelle Modifikatoren speichern */
-                /*     del_mods(MOD_BIT(KC_LALT)| MOD_BIT(KC_LSFT)); // Alt und Shift entfernen */
-                /*     tap_code16(S(DE_SS)); // Shift DE_ADIA -> Ä */
-                /*     set_mods(mods); // Modifikatoren wiederherstellen */
-                /* } else if (alt_held) { */
                 if (right_shift_held) {
                     uint8_t mods = get_mods(); // Aktuelle Modifikatoren speichern
                     del_mods(MOD_BIT(KC_RSFT)); // Alt und Shift entfernen
@@ -113,28 +104,68 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 }
                 return false;
 
+            /* case MORPH_BSPC: */
+            /*     if (shift_held) { */
+            /*         uint8_t mods = get_mods(); // Aktuelle Modifikatoren speichern */
+            /*         del_mods(MOD_BIT(KC_LSFT)); // Alt und Shift entfernen */
+            /*         tap_code(KC_DEL); // DE_ADIA -> ä */
+            /*         set_mods(mods); // Modifikatoren wiederherstellen */
+            /*     } else { */
+            /*         tap_code(KC_BSPC); // Standard: A */
+            /*     } */
+            /*     return false; */
+
             case MORPH_BSPC:
-                /* if (alt_held && shift_held) { */
-                /*     uint8_t mods = get_mods(); // Aktuelle Modifikatoren speichern */
-                /*     del_mods(MOD_BIT(KC_LALT)| MOD_BIT(KC_LSFT)); // Alt und Shift entfernen */
-                /*     tap_code16(S(DE_SS)); // Shift DE_ADIA -> Ä */
-                /*     set_mods(mods); // Modifikatoren wiederherstellen */
-                /* } else if (alt_held) { */
                 if (shift_held) {
                     uint8_t mods = get_mods(); // Aktuelle Modifikatoren speichern
-                    del_mods(MOD_BIT(KC_LSFT)); // Alt und Shift entfernen
-                    tap_code(KC_DEL); // DE_ADIA -> ä
+                    del_mods(MOD_BIT(KC_LSFT)); // Shift entfernen
+                    tap_code(KC_DEL); // Shift + Backspace -> Delete
                     set_mods(mods); // Modifikatoren wiederherstellen
                 } else {
-                    tap_code(KC_BSPC); // Standard: A
+                    // Aktivieren der Wiederholung für Backspace
+                    backspace_active = true; // Markiere, dass Backspace gehalten wird
+                    backspace_timer = timer_read(); // Timer für Wiederholung starten
+                    tap_code(KC_BSPC); // Backspace initial senden
                 }
                 return false;
+
+            default:
+                break;
+        }
+    } else {
+        switch (keycode) {
+            case MORPH_BSPC:
+                // Deaktivieren, wenn Taste losgelassen wird
+                backspace_active = false;
+                break;
+
+            default:
+                break;
+
+
         }
     }
     return true;
 }
 
+/* void matrix_scan_user(void) { */
+/*     static uint16_t last_timer; */
+/**/
+/*     if (timer_elapsed(backspace_timer) > 150 && timer_elapsed(last_timer) > 50) { */
+/*         // Wenn `MORPH_BSPC` gehalten wird, wiederhole Backspace */
+/*         if (is_key_pressed(MORPH_BSPC)) { */
+/*             tap_code(KC_BSPC); */
+/*             last_timer = timer_read(); */
+/*         } */
+/*     } */
+/* } */
 
+void matrix_scan_user(void) {
+    if (backspace_active && timer_elapsed(backspace_timer) > 150) {
+        tap_code(KC_BSPC); // Wiederhole Backspace
+        backspace_timer = timer_read(); // Timer zurücksetzen
+    }
+}
 
 
 
