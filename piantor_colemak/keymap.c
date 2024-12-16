@@ -7,6 +7,7 @@
 // Globale Variablen für die Backspace-Wiederholung
 static bool backspace_active = false;  // Status der Backspace-Taste
 static uint16_t backspace_timer = 0;   // Timer für die Wiederholung
+static bool first_repeat = true;       // Status der ersten Wiederholung
 
 enum layers {
     _BASE,
@@ -125,6 +126,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     // Aktivieren der Wiederholung für Backspace
                     backspace_active = true; // Markiere, dass Backspace gehalten wird
                     backspace_timer = timer_read(); // Timer für Wiederholung starten
+                    first_repeat = true;            // Erste Wiederholung aktivieren
                     tap_code(KC_BSPC); // Backspace initial senden
                 }
                 return false;
@@ -137,6 +139,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             case MORPH_BSPC:
                 // Deaktivieren, wenn Taste losgelassen wird
                 backspace_active = false;
+                first_repeat = true; // Reset für die nächste Nutzung
                 break;
 
             default:
@@ -148,25 +151,29 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 
+
 /* void matrix_scan_user(void) { */
-/*     static uint16_t last_timer; */
-/**/
-/*     if (timer_elapsed(backspace_timer) > 150 && timer_elapsed(last_timer) > 50) { */
-/*         // Wenn `MORPH_BSPC` gehalten wird, wiederhole Backspace */
-/*         if (is_key_pressed(MORPH_BSPC)) { */
-/*             tap_code(KC_BSPC); */
-/*             last_timer = timer_read(); */
-/*         } */
+/*     if (backspace_active && timer_elapsed(backspace_timer) > 150) { */
+/*         tap_code(KC_BSPC); // Wiederhole Backspace */
+/*         backspace_timer = timer_read(); // Timer zurücksetzen */
 /*     } */
 /* } */
 
+
 void matrix_scan_user(void) {
-    if (backspace_active && timer_elapsed(backspace_timer) > 150) {
-        tap_code(KC_BSPC); // Wiederhole Backspace
-        backspace_timer = timer_read(); // Timer zurücksetzen
+    static bool first_repeat = true; // Markiere, ob es die erste Wiederholung ist
+
+    if (backspace_active) {
+        if (first_repeat && timer_elapsed(backspace_timer) > 150) { // Initiale Verzögerung: 150 ms
+            tap_code(KC_BSPC);          // Sende erste Wiederholung
+            backspace_timer = timer_read();
+            first_repeat = false;       // Wechsel zur schnelleren Wiederholung
+        } else if (!first_repeat && timer_elapsed(backspace_timer) > 50) { // Wiederholrate: 50 ms
+            tap_code(KC_BSPC);
+            backspace_timer = timer_read();
+        }
     }
 }
-
 
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
