@@ -18,10 +18,9 @@
 
 #define MASTER_LEFT
 
-#define UNICODE_SELECTED_MODES UNICODE_MODE_MACOS
-// #define UNICODE_SELECTED_MODES UNICODE_MODE_WINCOMPOSE
-// #define UNICODE_KEY_MAC
+#define UNICODE_SELECTED_MODES UNICODE_MODE_WINCOMPOSE
 
 #define TAPPING_TERM 200  // Zeit (in ms), um zwischen Tap und Hold zu unterscheiden
 // #define PERMISSIVE_HOLD  // Erlaubt das Halten von Mod-Taps auch nach Ablauf des Tapping-Terms
+// #define HOLD_ON_OTHER_KEY_PRESS
 

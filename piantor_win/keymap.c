@@ -4,11 +4,11 @@
 #include QMK_KEYBOARD_H
 #include  "keymap_german.h"
 
+
 // Globale Variablen für die Backspace-Wiederholung
 static bool backspace_active = false;  // Status der Backspace-Taste
 static uint16_t backspace_timer = 0;   // Timer für die Wiederholung
 static bool first_repeat = true;       // Status der ersten Wiederholung
-static bool lctl_ent_active = false;   // Verfolgt, ob LCTL (MT(MOD_LCTL, KC_ENT)) aktiv ist
 
 enum layers {
     _BASE,
@@ -23,11 +23,36 @@ enum custom_keycodes {
     MORPH_UE,
     MORPH_SS,
     MORPH_SPACE,
-    MORPH_BSPC,
-    // Windows Macros
-    LGUI_D
+    MORPH_BSPC
 };
 
+
+// Key Override
+const key_override_t lgui_a_to_lctl_a = ko_make_basic(MOD_MASK_GUI, KC_A, C(KC_A));
+const key_override_t lgui_c_to_lctl_c = ko_make_basic(MOD_MASK_GUI, KC_C, C(KC_C));
+const key_override_t lgui_f_to_lctl_f = ko_make_basic(MOD_MASK_GUI, KC_F, C(KC_F));
+const key_override_t lgui_v_to_lctl_v = ko_make_basic(MOD_MASK_GUI, KC_V, C(KC_V));
+const key_override_t lgui_x_to_lctl_x = ko_make_basic(MOD_MASK_GUI, KC_X, C(KC_X));
+const key_override_t lgui_z_to_lctl_z = ko_make_basic(MOD_MASK_GUI, KC_Z, C(KC_Z));
+
+const key_override_t lshift_lgui_space_to_lctl_enter = ko_make_basic(MOD_MASK_SHIFT | MOD_MASK_GUI, KC_SPACE, C(KC_ENT));
+
+const key_override_t lgui_w_to_lalt_f4 = ko_make_basic(MOD_MASK_GUI, KC_W, A(KC_F4));
+
+
+// Array von Key Overrides
+const key_override_t *key_overrides[] = {
+    &lgui_a_to_lctl_a,
+    &lgui_c_to_lctl_c,
+    &lgui_f_to_lctl_f,
+    &lgui_v_to_lctl_v,
+    &lgui_x_to_lctl_x,
+    &lgui_z_to_lctl_z,
+    &lshift_lgui_space_to_lctl_enter,
+
+    &lgui_w_to_lalt_f4,  // Neuer Key Override
+    NULL // Array muss mit NULL enden
+};
 
 // Custom behavior for morph keys
 //
@@ -38,25 +63,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         bool right_shift_held = get_mods() & MOD_BIT(KC_RSFT); // Prüfen, ob Shift gehalten wird
 
         switch (keycode) {
-            case MT(MOD_LCTL, KC_ENT): // Wenn MT(MOD_LCTL, KC_ENT) gedrückt wird
-                if (record->event.pressed) {
-                    lctl_ent_active = true; // LCTL aktiv
-                } else {
-                    lctl_ent_active = false; // LCTL nicht mehr aktiv
-                    register_code(KC_LCTL); // LCTL erneut aktivieren, falls nötig
-                }
-                return true; // Standardverhalten beibehalten
-
-            case KC_D: // Wenn "D" gedrückt wird
-                if (lctl_ent_active) { // Prüfen, ob LCTL aktiv ist
-                    unregister_code(KC_LCTL); // LCTL loslassen
-                    register_code(KC_LGUI);  // LGUI drücken
-                    register_code(KC_D);     // D drücken
-                    return false; // Standardverhalten für D
-                }
-                break; // Verhindert Standardverhalten
-    // generelle Macros
-
             case MORPH_AE:
                 if (alt_held && shift_held) {
                     uint8_t mods = get_mods(); // Aktuelle Modifikatoren speichern
@@ -202,8 +208,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_BASE] = LAYOUT_split_3x6_3(
         KC_TAB,                 KC_Q,       KC_W,       KC_F,       KC_P,       KC_B,                                                               KC_J,           KC_L,           MORPH_UE,KC_Z,    KC_RBRC,     KC_NUHS,
         MT(MOD_LSFT, KC_ESC),   MORPH_AE,   KC_R,       MORPH_SS,   KC_T,       KC_G,                                                               KC_M,           KC_N,           KC_E,    KC_I,    MORPH_OE,     KC_RSFT,
-        KC_LGUI,                KC_Y,       KC_X,       KC_C,       KC_D,       KC_V,                                                               KC_K,           KC_H,           KC_COMM, KC_DOT,  KC_SLSH,      KC_GRV,
-                                                                    KC_LALT,    MO(_LOWER),     MT(MOD_LCTL, KC_ENT),               MORPH_SPACE,    MORPH_BSPC,     MO(_UPPER)
+        KC_LCTL,                KC_Y,       KC_X,       KC_C,       KC_D,       KC_V,                                                               KC_K,           KC_H,           KC_COMM, KC_DOT,  KC_SLSH,      KC_GRV,
+                                                                    KC_LALT,    MO(_LOWER),     MT(MOD_LGUI, KC_ENT),               MORPH_SPACE,    MORPH_BSPC,     MO(_UPPER)
     ),
 
     [_LOWER] = LAYOUT_split_3x6_3(
