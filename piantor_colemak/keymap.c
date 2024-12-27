@@ -15,6 +15,7 @@ enum layers {
     _UPPER
 };
 
+
 // Custom keycodes
 enum custom_keycodes {
     MORPH_AE = SAFE_RANGE,
@@ -188,10 +189,10 @@ void matrix_scan_user(void) {
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_BASE] = LAYOUT_split_3x6_3(
-        KC_TAB,                 KC_Q,       KC_W,       KC_F,       KC_P,       KC_B,                                                               KC_J,           KC_L,           MORPH_UE,KC_Z,    KC_RBRC,     KC_NUHS,
+        MT(MOD_HYPR, KC_TAB),   KC_Q,       KC_W,       KC_F,       KC_P,       KC_B,                                                               KC_J,           KC_L,           MORPH_UE,KC_Z,    KC_RBRC,     KC_NUHS,
         MT(MOD_LSFT, KC_ESC),   MORPH_AE,   KC_R,       MORPH_SS,   KC_T,       KC_G,                                                               KC_M,           KC_N,           KC_E,    KC_I,    MORPH_OE,     KC_RSFT,
         KC_LCTL,                KC_Y,       KC_X,       KC_C,       KC_D,       KC_V,                                                               KC_K,           KC_H,           KC_COMM, KC_DOT,  KC_SLSH,      KC_GRV,
-                                                                    KC_LALT,    MO(_LOWER),     MT(MOD_LGUI, KC_ENT),               KC_SPACE,    MORPH_BSPC,     MO(_UPPER)
+                                                                    KC_LALT,    LT(MO(_LOWER), KC_DEL),     MT(MOD_LGUI, KC_ENT),   KC_SPACE,       MORPH_BSPC,     LT(MO(_UPPER), QK_REP)
     ),
 
     [_LOWER] = LAYOUT_split_3x6_3(
@@ -201,7 +202,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                                         _______,     _______,    _______,                    _______, _______, _______
     ),
     [_UPPER] = LAYOUT_split_3x6_3(
-        KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,                                            KC_NO,      KC_NO,      KC_NO,      KC_NO,     KC_NO,      KC_NO,
+        KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      QK_REP,                                            KC_NO,      KC_NO,      KC_NO,      KC_NO,     KC_NO,      KC_NO,
         _______,    KC_F1,      KC_F2,      KC_F3,      KC_F4,      KC_F5,                                            KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_SCLN,    QK_BOOT,
         KC_NO,      KC_F6,      KC_F7,      KC_F8,      KC_F9,      KC_F10,                                           KC_NO,      KC_MPRV,    KC_VOLD,    KC_VOLU,    KC_MNXT,    KC_MPLY,
                                                         _______,    _______,    _______,                    _______,  _______,    _______
