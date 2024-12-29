@@ -4,7 +4,6 @@
 #include QMK_KEYBOARD_H
 #include  "keymap_german.h"
 
-
 // Globale Variablen für die Backspace-Wiederholung
 static bool backspace_active = false;  // Status der Backspace-Taste
 static uint16_t backspace_timer = 0;   // Timer für die Wiederholung
@@ -15,6 +14,7 @@ enum layers {
     _LOWER,
     _UPPER
 };
+
 
 // Custom keycodes
 enum custom_keycodes {
@@ -28,39 +28,22 @@ enum custom_keycodes {
 
 
 // Key Override
-const key_override_t lgui_a_to_lctl_a = ko_make_basic(MOD_MASK_GUI, KC_A, C(KC_A));
-const key_override_t lgui_c_to_lctl_c = ko_make_basic(MOD_MASK_GUI, KC_C, C(KC_C));
-const key_override_t lgui_f_to_lctl_f = ko_make_basic(MOD_MASK_GUI, KC_F, C(KC_F));
-const key_override_t lgui_v_to_lctl_v = ko_make_basic(MOD_MASK_GUI, KC_V, C(KC_V));
-const key_override_t lgui_x_to_lctl_x = ko_make_basic(MOD_MASK_GUI, KC_X, C(KC_X));
-const key_override_t lgui_z_to_lctl_z = ko_make_basic(MOD_MASK_GUI, KC_Z, C(KC_Z));
-
-const key_override_t lshift_lgui_space_to_lctl_enter = ko_make_basic(MOD_MASK_SHIFT | MOD_MASK_GUI, KC_SPACE, C(KC_ENT));
-
-const key_override_t lgui_w_to_lalt_f4 = ko_make_basic(MOD_MASK_GUI, KC_W, A(KC_F4));
+const key_override_t lshift_lgui_space_to_lctl_enter = ko_make_basic(MOD_MASK_SHIFT | MOD_MASK_GUI, KC_SPACE, G(KC_ENT));
 
 
 // Array von Key Overrides
 const key_override_t *key_overrides[] = {
-    &lgui_a_to_lctl_a,
-    &lgui_c_to_lctl_c,
-    &lgui_f_to_lctl_f,
-    &lgui_v_to_lctl_v,
-    &lgui_x_to_lctl_x,
-    &lgui_z_to_lctl_z,
     &lshift_lgui_space_to_lctl_enter,
 
-    &lgui_w_to_lalt_f4,  // Neuer Key Override
     NULL // Array muss mit NULL enden
 };
-
 // Custom behavior for morph keys
 //
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (record->event.pressed) {
         bool alt_held = get_mods() & MOD_BIT(KC_LALT);    // Prüfen, ob Alt gehalten wird
         bool shift_held = get_mods() & MOD_BIT(KC_LSFT); // Prüfen, ob Shift gehalten wird
-        bool right_shift_held = get_mods() & MOD_BIT(KC_RSFT); // Prüfen, ob Shift gehalten wird
+        /* bool right_shift_held = get_mods() & MOD_BIT(KC_RSFT); // Prüfen, ob Shift gehalten wird */
 
         switch (keycode) {
             case MORPH_AE:
@@ -122,16 +105,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 }
                 return false;
 
-            case MORPH_SPACE:
-                if (right_shift_held) {
-                    uint8_t mods = get_mods(); // Aktuelle Modifikatoren speichern
-                    del_mods(MOD_BIT(KC_RSFT)); // Alt und Shift entfernen
-                    tap_code(KC_RGUI); // DE_ADIA -> ä
-                    set_mods(mods); // Modifikatoren wiederherstellen
-                } else {
-                    tap_code(KC_SPACE); // Standard: A
-                }
-                return false;
+            /* case MORPH_SPACE: */
+            /*     if (right_shift_held) { */
+            /*         uint8_t mods = get_mods(); // Aktuelle Modifikatoren speichern */
+            /*         del_mods(MOD_BIT(KC_RSFT)); // Alt und Shift entfernen */
+            /*         tap_code(KC_RGUI); // DE_ADIA -> ä */
+            /*         set_mods(mods); // Modifikatoren wiederherstellen */
+            /*     } else { */
+            /*         tap_code(KC_SPACE); // Standard: A */
+            /*     } */
+            /*     return false; */
 
             /* case MORPH_BSPC: */
             /*     if (shift_held) { */
@@ -144,20 +127,20 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             /*     } */
             /*     return false; */
 
-            case MORPH_BSPC:
-                if (shift_held) {
-                    uint8_t mods = get_mods(); // Aktuelle Modifikatoren speichern
-                    del_mods(MOD_BIT(KC_LSFT)); // Shift entfernen
-                    tap_code(KC_DEL); // Shift + Backspace -> Delete
-                    set_mods(mods); // Modifikatoren wiederherstellen
-                } else {
-                    // Aktivieren der Wiederholung für Backspace
-                    backspace_active = true; // Markiere, dass Backspace gehalten wird
-                    backspace_timer = timer_read(); // Timer für Wiederholung starten
-                    first_repeat = true;            // Erste Wiederholung aktivieren
-                    tap_code(KC_BSPC); // Backspace initial senden
-                }
-                return false;
+            /* case MORPH_BSPC: */
+            /*     if (shift_held) { */
+            /*         uint8_t mods = get_mods(); // Aktuelle Modifikatoren speichern */
+            /*         del_mods(MOD_BIT(KC_LSFT)); // Shift entfernen */
+            /*         tap_code(KC_DEL); // Shift + Backspace -> Delete */
+            /*         set_mods(mods); // Modifikatoren wiederherstellen */
+            /*     } else { */
+            /*         // Aktivieren der Wiederholung für Backspace */
+            /*         backspace_active = true; // Markiere, dass Backspace gehalten wird */
+            /*         backspace_timer = timer_read(); // Timer für Wiederholung starten */
+            /*         first_repeat = true;            // Erste Wiederholung aktivieren */
+            /*         tap_code(KC_BSPC); // Backspace initial senden */
+            /*     } */
+            /*     return false; */
 
             default:
                 break;
@@ -206,10 +189,10 @@ void matrix_scan_user(void) {
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_BASE] = LAYOUT_split_3x6_3(
-        KC_TAB,                 KC_Q,       KC_W,       KC_F,       KC_P,       KC_B,                                                               KC_J,           KC_L,           MORPH_UE,KC_Z,    KC_RBRC,     KC_NUHS,
+        MT(MOD_HYPR, KC_TAB),   KC_Q,       KC_W,       KC_F,       KC_P,       KC_B,                                                               KC_J,           KC_L,           MORPH_UE,KC_Z,    KC_RBRC,     KC_NUHS,
         MT(MOD_LSFT, KC_ESC),   MORPH_AE,   KC_R,       MORPH_SS,   KC_T,       KC_G,                                                               KC_M,           KC_N,           KC_E,    KC_I,    MORPH_OE,     KC_RSFT,
         KC_LCTL,                KC_Y,       KC_X,       KC_C,       KC_D,       KC_V,                                                               KC_K,           KC_H,           KC_COMM, KC_DOT,  KC_SLSH,      KC_GRV,
-                                                                    MT(MOD_LALT, KC_DEL),    LT(MO(_LOWER), QK_REP),     MT(MOD_LGUI, KC_ENT),   KC_SPACE,       MORPH_BSPC,     MO(_UPPER)
+                                                                    MT(MOD_LALT, KC_DEL),    LT(MO(_LOWER), QK_REP),     MT(MOD_LGUI, KC_ENT),   KC_SPACE,       LT(MO(_UPPER), KC_BSPC),     KC_LALT
     ),
 
     [_LOWER] = LAYOUT_split_3x6_3(
@@ -219,7 +202,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                                         _______,     _______,    _______,                    _______, _______, _______
     ),
     [_UPPER] = LAYOUT_split_3x6_3(
-        KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,                                            KC_NO,      KC_NO,      KC_NO,      KC_NO,     KC_NO,      KC_NO,
+        KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      QK_REP,                                            KC_NO,      KC_NO,      KC_NO,      KC_NO,     KC_NO,      KC_NO,
         _______,    KC_F1,      KC_F2,      KC_F3,      KC_F4,      KC_F5,                                            KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_SCLN,    QK_BOOT,
         KC_NO,      KC_F6,      KC_F7,      KC_F8,      KC_F9,      KC_F10,                                           KC_NO,      KC_MPRV,    KC_VOLD,    KC_VOLU,    KC_MNXT,    KC_MPLY,
                                                         _______,    _______,    _______,                    _______,  _______,    _______
