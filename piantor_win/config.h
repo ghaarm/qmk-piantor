@@ -20,7 +20,7 @@
 
 #define UNICODE_SELECTED_MODES UNICODE_MODE_WINCOMPOSE
 
-#define TAPPING_TERM 200  // Zeit (in ms), um zwischen Tap und Hold zu unterscheiden
+#define TAPPING_TERM 150  // Zeit (in ms), um zwischen Tap und Hold zu unterscheiden
 // #define PERMISSIVE_HOLD  // Erlaubt das Halten von Mod-Taps auch nach Ablauf des Tapping-Terms
 // #define HOLD_ON_OTHER_KEY_PRESS
 

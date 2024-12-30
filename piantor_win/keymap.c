@@ -17,15 +17,34 @@ enum layers {
     _FUNCTION
 };
 
-// Custom keycodes
-enum custom_keycodes {
-    MORPH_AE = SAFE_RANGE,
-    MORPH_OE,
-    MORPH_UE,
-    MORPH_SS,
-    MORPH_SPACE,
-    MORPH_BSPC
+// https://docs.qmk.fm/features/combo
+// Definiere die Combo-Events
+enum combo_events {
+    BSPC_LSFT_CLEAR,
 };
+
+// Definiere die Combos
+const uint16_t PROGMEM clear_line_combo[] = {KC_LGUI, KC_BSPC, COMBO_END}; // LGUI + Backspace
+
+// Kombiniere die Combos in ein Array
+combo_t key_combos[] = {
+    [BSPC_LSFT_CLEAR] = COMBO_ACTION(clear_line_combo), // LGUI + Backspace
+};
+
+
+// Verarbeite die Combos
+void process_combo_event(uint16_t combo_index, bool pressed) {
+    switch (combo_index) {
+
+        case BSPC_LSFT_CLEAR:
+            if (pressed) {
+                tap_code16(S(KC_HOME));  // Shift + Home
+                tap_code16(KC_DEL);      // Delete
+            }
+            break;
+    }
+}
+
 
 
 // Key Override
@@ -35,6 +54,9 @@ const key_override_t lgui_f_to_lctl_f = ko_make_basic(MOD_MASK_GUI, KC_F, C(KC_F
 const key_override_t lgui_v_to_lctl_v = ko_make_basic(MOD_MASK_GUI, KC_V, C(KC_V));
 const key_override_t lgui_x_to_lctl_x = ko_make_basic(MOD_MASK_GUI, KC_X, C(KC_X));
 const key_override_t lgui_z_to_lctl_z = ko_make_basic(MOD_MASK_GUI, KC_Z, C(KC_Z));
+
+
+const key_override_t lalt_backspace_to_lctl_backspace = ko_make_basic(MOD_BIT(KC_LALT), KC_BSPC, C(KC_BSPC));
 
 const key_override_t lshift_lgui_space_to_lctl_enter = ko_make_basic(MOD_MASK_SHIFT | MOD_MASK_GUI, KC_SPACE, C(KC_ENT));
 
@@ -49,17 +71,31 @@ const key_override_t *key_overrides[] = {
     &lgui_v_to_lctl_v,
     &lgui_x_to_lctl_x,
     &lgui_z_to_lctl_z,
+
+    &lalt_backspace_to_lctl_backspace,
+
     &lshift_lgui_space_to_lctl_enter,
 
     &lgui_w_to_lalt_f4,  // Neuer Key Override
     NULL // Array muss mit NULL enden
 };
 
+
+// Custom keycodes
+enum custom_keycodes {
+    MORPH_AE = SAFE_RANGE,
+    MORPH_OE,
+    MORPH_UE,
+    MORPH_SS,
+    MORPH_SPACE,
+    MORPH_BSPC
+};
+
 // Custom behavior for morph keys
 //
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (record->event.pressed) {
-        bool alt_held = get_mods() & MOD_BIT(KC_LALT);    // Prüfen, ob Alt gehalten wird
+        bool alt_held = get_mods() & MOD_MASK_ALT;    // Prüfen, ob Alt gehalten wird
         bool shift_held = get_mods() & MOD_BIT(KC_LSFT); // Prüfen, ob Shift gehalten wird
         /* bool right_shift_held = get_mods() & MOD_BIT(KC_RSFT); // Prüfen, ob Shift gehalten wird */
 
@@ -172,17 +208,16 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_LOWER] = LAYOUT_split_3x6_3(
         KC_NUBS,   LSFT(KC_1), LSFT(KC_2), LSFT(KC_3),  LSFT(KC_4),  LSFT(KC_5),                                      LSFT(KC_6),         LSFT(KC_7),         LSFT(KC_8),     LSFT(KC_9), LSFT(KC_0), LSFT(KC_MINS),
-        _______,   KC_NO,       KC_END,       KC_PAGE_DOWN,        KC_PAGE_UP,        KC_HOME,                                            KC_LEFT,            KC_DOWN,            KC_UP,          KC_RGHT,    KC_NO,      KC_EQL,
-        _______,   KC_NO,       KC_NO,       KC_NO,        KC_NO,       KC_NO,                                            LSFT(LGUI(KC_8)),   LSFT(LGUI(KC_9)),   LALT(KC_8),     LALT(KC_9), KC_NO,      KC_PIPE,
+        _______,    KC_1,      KC_2,      KC_3,      KC_4,      KC_5,                                                 KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_SCLN,    _______,
+        _______,      KC_6,      KC_7,      KC_8,      KC_9,      KC_0,                                               LSFT(LGUI(KC_8)),   LSFT(LGUI(KC_9)),   LALT(KC_8),     LALT(KC_9), KC_NO,      KC_PIPE,
                                                         _______,     _______,    _______,                    _______, _______, _______
     ),
     [_UPPER] = LAYOUT_split_3x6_3(
-        KC_NO,      KC_NO,     KC_NO,     KC_NO,     KC_NO,     QK_REP,                                         KC_NO,      KC_MPRV,    KC_VOLD,    KC_VOLU,    KC_MNXT,    QK_BOOT,
-        _______,    KC_1,      KC_2,      KC_3,      KC_4,      KC_5,                                           KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_SCLN,    _______,
-        KC_NO,      KC_6,      KC_7,      KC_8,      KC_9,      KC_0,                                           KC_NO,      KC_MPRV,    KC_COMM,    KC_DOT,    KC_MNXT,    KC_MPLY,
+        KC_NO,      KC_NO,     KC_NO,     KC_NO,     KC_NO,     QK_REP,                                         KC_HOME,       KC_PAGE_UP,        KC_PAGE_DOWN,        KC_END,   KC_NO,  QK_BOOT,
+         _______,   KC_NO,       KC_NO,       KC_NO,        KC_NO,       KC_NO,                                KC_LEFT,            KC_DOWN,            KC_UP,          KC_RGHT,    KC_NO,      KC_EQL,
+         _______,   KC_NO,       KC_NO,       KC_NO,        KC_NO,       KC_NO,                                          KC_NO,      KC_MPRV,    KC_COMM,    KC_DOT,    KC_MNXT,    KC_MPLY,
+
                                                         _______,    _______,    _______,                    _______,  _______,    _______
-
-
     ),
     [_FUNCTION] = LAYOUT_split_3x6_3(
         KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      QK_REP,                                            KC_NO,      KC_NO,      KC_NO,      KC_NO,     KC_NO,      KC_NO,
