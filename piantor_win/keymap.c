@@ -14,7 +14,7 @@ enum layers {
     _BASE,
     _LOWER,
     _UPPER,
-    _FUNCTION,
+    _HYPR,
 };
 
 // https://docs.qmk.fm/features/combo
@@ -195,38 +195,38 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
 /*     } */
 /* } */
 
-
-void matrix_scan_user(void) {
-    if (layer_state_is(_LOWER) && layer_state_is(_UPPER)) {
-        layer_on(_FUNCTION); // Aktiviere das Function-Layer
-    } else {
-        layer_off(_FUNCTION); // Deaktiviere das Function-Layer
-    }
-}
+// nicht mehr notwendig da Layer über HYPR gelöst
+// void matrix_scan_user(void) {
+//     if (layer_state_is(_LOWER) && layer_state_is(_UPPER)) {
+//         layer_on(_FUNCTION); // Aktiviere das Function-Layer
+//     } else {
+//         layer_off(_FUNCTION); // Deaktiviere das Function-Layer
+//     }
+// }
 
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_BASE] = LAYOUT_split_3x6_3(
-        MT(MOD_HYPR, KC_TAB),   KC_Q,       KC_W,       KC_F,       KC_P,       KC_B,                                                               KC_J,           KC_L,           KC_U,KC_Z,    KC_RBRC,     KC_NUHS,
-        MT(MOD_LSFT, KC_ESC),   KC_A,   KC_R,       KC_S,   KC_T,       KC_G,                                                               KC_M,           KC_N,           KC_E,    KC_I,    KC_O,     KC_RSFT,
-        KC_LCTL,                KC_Y,       KC_X,       KC_C,       KC_D,       KC_V,                                                               KC_K,           KC_H,           KC_COMM, KC_DOT,  KC_SLSH,      KC_NUBS,
-                                                                    MT(MOD_LALT, KC_DEL),    LT_REP,     MT(MOD_LGUI, KC_ENT),   KC_SPACE,       LT(MO(_UPPER), KC_BSPC),     KC_RALT
+        LT(MO(_HYPR), KC_TAB),   KC_Q,       KC_W,       KC_F,       KC_P,       KC_B,                                  KC_J,           KC_L,        KC_U,        KC_Z,        KC_RBRC,     KC_NUHS,
+        MT(MOD_LSFT, KC_ESC),    KC_A,       KC_R,       KC_S,       KC_T,       KC_G,                                  KC_M,           KC_N,        KC_E,        KC_I,        KC_O,        KC_RSFT,
+        KC_LCTL,                 KC_Y,       KC_X,       KC_C,       KC_D,       KC_V,                                  KC_K,           KC_H,        KC_COMM,     KC_DOT,      KC_SLSH,     KC_NUBS,
+                                               MT(MOD_LALT, KC_DEL),    LT_REP,  MT(MOD_LGUI, KC_ENT),       KC_SPACE,  LT(MO(_UPPER), KC_BSPC),     KC_RALT
     ),
 
     [_LOWER] = LAYOUT_split_3x6_3(
-        KC_GRV,   LSFT(KC_1), LSFT(KC_2), LSFT(KC_3),  LSFT(KC_4),  LSFT(KC_5),                                      LSFT(KC_6),         LSFT(KC_7),         LSFT(KC_8),     LSFT(KC_9), LSFT(KC_0), LSFT(KC_MINS),
-        _______,    KC_1,      KC_2,      KC_3,      KC_4,      KC_5,                                                 KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_SCLN,    KC_EQL,
-        _______,      KC_6,      KC_7,      KC_8,      KC_9,      KC_0,                                               LSFT(LGUI(KC_8)),   LSFT(LGUI(KC_9)),   LALT(KC_8),     LALT(KC_9), KC_NO,      KC_PIPE,
+        KC_GRV,       LSFT(KC_1), LSFT(KC_2), LSFT(KC_3),  LSFT(KC_4),  LSFT(KC_5),                                       LSFT(KC_6),         LSFT(KC_7),         LSFT(KC_8),     LSFT(KC_9), LSFT(KC_0), LSFT(KC_MINS),
+        _______,      KC_1,       KC_2,       KC_3,        KC_4,        KC_5,                                             KC_NO,              KC_NO,              KC_NO,          KC_NO,      KC_SCLN,    KC_EQL,
+        _______,      KC_6,       KC_7,       KC_8,        KC_9,        KC_0,                                             LSFT(LGUI(KC_8)),   LSFT(LGUI(KC_9)),   LALT(KC_8),     LALT(KC_9), KC_NO,      KC_PIPE,
                                                         _______,     _______,    _______,                    _______, _______, _______
     ),
     [_UPPER] = LAYOUT_split_3x6_3(
-        KC_NO,      KC_NO,     KC_NO,     KC_NO,     KC_NO,     QK_REP,                                        KC_NO,      KC_MPRV,    KC_COMM,    KC_DOT,   KC_NO,  QK_BOOT,
-         _______,   KC_NO,       KC_NO,       KC_NO,        KC_NO,       KC_NO,                                KC_LEFT,            KC_DOWN,            KC_UP,          KC_RGHT,    KC_NO,      KC_NO,
+        KC_NO,      KC_NO,       KC_NO,       KC_NO,        KC_NO,       QK_REP,                               KC_NO,         KC_MPRV,             KC_COMM,           KC_DOT,    KC_NO,      QK_BOOT,
+         _______,   KC_NO,       KC_NO,       KC_NO,        KC_NO,       KC_NO,                                KC_LEFT,       KC_DOWN,             KC_UP,             KC_RGHT,   KC_NO,      KC_NO,
          _______,   KC_NO,       KC_NO,       KC_NO,        KC_NO,       KC_NO,                                KC_HOME,       KC_PAGE_DOWN,        KC_PAGE_UP,        KC_END,    KC_MNXT,    KC_MPLY,
 
                                                         _______,    _______,    _______,                    _______,  _______,    _______
     ),
-    [_FUNCTION] = LAYOUT_split_3x6_3(
+    [_HYPR] = LAYOUT_split_3x6_3(
         KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      QK_REP,                                            KC_NO,      KC_NO,      KC_NO,      KC_NO,     KC_NO,      KC_NO,
         _______,    KC_F1,      KC_F2,      KC_F3,      KC_F4,      KC_F5,                                            KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_SCLN,    QK_BOOT,
         KC_NO,      KC_F6,      KC_F7,      KC_F8,      KC_F9,      KC_F10,                                           KC_NO,      KC_MPRV,    KC_VOLD,    KC_VOLU,    KC_MNXT,    KC_MPLY,
