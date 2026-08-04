@@ -67,6 +67,7 @@ void process_combo_event(uint16_t combo_index, bool pressed) {
 }
 void leader_end_user(void) {
     if (leader_sequence_one_key(KC_S)) {
+    }
     // } else if (leader_sequence_three_keys(KC_A, KC_R, KC_B)) {
     //     SEND_STRING("arbeit@example.com");
     // }
@@ -129,7 +130,9 @@ static bool handle_gui_ent_chord(uint16_t keycode) {
     switch (keycode) {
         case KC_A:
         case KC_C:
+        case KC_D:
         case KC_F:
+        case KC_N:
         case KC_S:
         case KC_V:
         case KC_X:
@@ -171,6 +174,32 @@ const key_override_t lgui_s_to_lctl_s = ko_make_basic(MOD_MASK_GUI, KC_S, C(KC_S
 const key_override_t lgui_v_to_lctl_v = ko_make_basic(MOD_MASK_GUI, KC_V, C(KC_V));
 const key_override_t lgui_x_to_lctl_x = ko_make_basic(MOD_MASK_GUI, KC_X, C(KC_X));
 const key_override_t lgui_z_to_lctl_z = ko_make_basic(MOD_MASK_GUI, KC_Z, C(KC_Z));
+
+const key_override_t lgui_n_to_lctl_n = {
+    .trigger_mods      = MOD_MASK_GUI,
+    .layers            = ~0,
+    .negative_mod_mask = MOD_MASK_SHIFT,
+    .suppressed_mods   = MOD_MASK_GUI,
+    .options           = ko_options_default,
+    .trigger           = KC_N,
+    .replacement       = C(KC_N),
+    .custom_action     = NULL,
+    .context           = NULL,
+    .enabled           = NULL,
+};
+
+const key_override_t lgui_shift_n_to_lctl_shift_n = {
+    .trigger_mods      = MOD_MASK_GUI | MOD_MASK_SHIFT,
+    .layers            = ~0,
+    .negative_mod_mask = 0,
+    .suppressed_mods   = MOD_MASK_GUI | MOD_MASK_SHIFT,
+    .options           = ko_options_default,
+    .trigger           = KC_N,
+    .replacement       = C(S(KC_N)),
+    .custom_action     = NULL,
+    .context           = NULL,
+    .enabled           = NULL,
+};
 
 
 // Key Override für Windows Navigation
@@ -314,6 +343,8 @@ const key_override_t *key_overrides[] = {
     &lgui_v_to_lctl_v,
     &lgui_x_to_lctl_x,
     &lgui_z_to_lctl_z,
+    &lgui_shift_n_to_lctl_shift_n,
+    &lgui_n_to_lctl_n,
 
     // Key Override für Windows Navigation
     &lalt_shift_f_to_lgui_up,
