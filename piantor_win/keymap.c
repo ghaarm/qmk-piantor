@@ -67,7 +67,6 @@ void process_combo_event(uint16_t combo_index, bool pressed) {
 }
 void leader_end_user(void) {
     if (leader_sequence_one_key(KC_S)) {
-    }
     // } else if (leader_sequence_three_keys(KC_A, KC_R, KC_B)) {
     //     SEND_STRING("arbeit@example.com");
     // }
@@ -89,19 +88,19 @@ const key_override_t alt_o_to_oe = ko_make_basic(MOD_MASK_ALT, KC_O, DE_ODIA);
 const key_override_t alt_u_to_ue = ko_make_basic(MOD_MASK_ALT, KC_U, DE_UDIA);
 const key_override_t alt_s_to_ss = ko_make_basic(MOD_MASK_ALT, KC_S, DE_SS);
 
-// Key Override für Windows allgemein
-const key_override_t hyper_del_to_ctrl_shift_enter = {
-    .trigger_mods      = MOD_MASK_CTRL | MOD_MASK_SHIFT | MOD_MASK_ALT | MOD_MASK_GUI,
-    .layers            = ~0,
-    .negative_mod_mask = 0,
-    .suppressed_mods   = MOD_MASK_CTRL | MOD_MASK_SHIFT | MOD_MASK_ALT | MOD_MASK_GUI,
-    .options           = ko_options_default,
-    .trigger           = KC_DEL,
-    .replacement       = C(S(KC_ENT)),
-    .custom_action     = NULL,
-    .context           = NULL,
-    .enabled           = NULL,
-};
+// // Key Override für Windows allgemein
+// const key_override_t hyper_del_to_ctrl_shift_enter = {
+//     .trigger_mods      = MOD_MASK_CTRL | MOD_MASK_SHIFT | MOD_MASK_ALT | MOD_MASK_GUI,
+//     .layers            = ~0,
+//     .negative_mod_mask = 0,
+//     .suppressed_mods   = MOD_MASK_CTRL | MOD_MASK_SHIFT | MOD_MASK_ALT | MOD_MASK_GUI,
+//     .options           = ko_options_default,
+//     .trigger           = KC_DEL,
+//     .replacement       = C(S(KC_ENT)),
+//     .custom_action     = NULL,
+//     .context           = NULL,
+//     .enabled           = NULL,
+// };
 
 bool delete_line_to_start(bool activated, void *context) {
     if (activated) {
@@ -334,7 +333,7 @@ const key_override_t *key_overrides[] = {
     &alt_s_to_ss,
 
     // Key Override für Windows
-    &hyper_del_to_ctrl_shift_enter,
+    // &hyper_del_to_ctrl_shift_enter,
 
     &lgui_a_to_lctl_a,
     &lgui_c_to_lctl_c,
@@ -554,7 +553,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      QK_REP,                                            KC_NO,      KC_NO,      KC_NO,      KC_NO,     KC_NO,      KC_NO,
         _______,    KC_F1,      KC_F2,      KC_F3,      KC_F4,      KC_F5,                                            KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_SCLN,    QK_BOOT,
         KC_NO,      KC_F6,      KC_F7,      KC_F8,      KC_F9,      KC_F10,                                           KC_NO,      KC_MPRV,    KC_VOLD,    KC_VOLU,    KC_MNXT,    KC_MPLY,
-        _______,    _______,    _______,                    _______,  _______,    _______
+        _______,    _______,    _______,                    _______,  LCTL(LALT(KC_DEL)),    _______
 
 
     )
