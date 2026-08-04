@@ -17,6 +17,11 @@ enum layers {
     _HYPR,
 };
 
+enum custom_keycodes {
+    GUI_ENT = SAFE_RANGE,
+    CTL_SPC,
+};
+
 // https://docs.qmk.fm/features/combo
 // Definiere die Combo-Events
 
@@ -36,7 +41,7 @@ bool get_combo_must_tap(uint16_t combo_index, combo_t *combo) {
     }
 }
 const uint16_t PROGMEM email_combo[] = {KC_Q, KC_W, COMBO_END};
-const uint16_t PROGMEM clear_line_combo[] = {MT(MOD_LGUI, KC_ENT), LT(MO(_UPPER), KC_BSPC), COMBO_END};
+const uint16_t PROGMEM clear_line_combo[] = {GUI_ENT, LT(MO(_UPPER), KC_BSPC), COMBO_END};
 const uint16_t PROGMEM xc_leader_combo[] = { KC_X, KC_C, COMBO_END };
 
 combo_t key_combos[] = {
@@ -62,19 +67,12 @@ void process_combo_event(uint16_t combo_index, bool pressed) {
 }
 void leader_end_user(void) {
     if (leader_sequence_one_key(KC_S)) {
-        SEND_STRING("S123");
-    } else if (leader_sequence_one_key(KC_T)) {
-        SEND_STRING("T1234");
-    } else if (leader_sequence_one_key(KC_G)) {
-        SEND_STRING("G134");
-    }
     // } else if (leader_sequence_three_keys(KC_A, KC_R, KC_B)) {
     //     SEND_STRING("arbeit@example.com");
     // }
 }
 
 #define HYPR_TAB LT(MO(_HYPR), KC_TAB)
-#define GUI_ENT MT(MOD_LGUI, KC_ENT)
 #define LT_REP LT(_LOWER, KC_0)
 // Use `LT_REP` in your layout...
 // https://getreuer.info/posts/keyboards/faqs/index.html#layer-tap-repeat-key
@@ -113,6 +111,15 @@ bool delete_line_to_start(bool activated, void *context) {
 }
 
 static bool alt_tab_active = false;
+static bool gui_ent_pressed = false;
+static bool gui_ent_registered = false;
+static bool gui_ent_search_sent = false;
+static bool gui_ent_ctrl_enter_sent = false;
+static uint16_t gui_ent_timer = 0;
+static bool ctl_spc_pressed = false;
+static bool ctl_spc_registered = false;
+static bool ctl_spc_search_sent = false;
+static uint16_t ctl_spc_timer = 0;
 
 static void release_alt_tab(void) {
     if (alt_tab_active) {
@@ -231,6 +238,8 @@ const key_override_t lalt_b_to_lgui_5 = {
     .enabled         = NULL,
 };
 
+const key_override_t lalt_d_to_lgui_d = ko_make_basic(MOD_BIT(KC_LALT), KC_D, LGUI(KC_D));
+
 const key_override_t lalt_backspace_to_lctl_backspace = ko_make_basic(MOD_BIT(KC_LALT), KC_BSPC, C(KC_BSPC));
 const key_override_t lalt_del_to_lctl_del = ko_make_basic(MOD_BIT(KC_LALT), KC_DEL, C(KC_DEL));
 
@@ -280,6 +289,7 @@ const key_override_t *key_overrides[] = {
     &lalt_f_to_lgui_3,
     &lalt_p_to_lgui_4,
     &lalt_b_to_lgui_5,
+    &lalt_d_to_lgui_d,
 
     &lalt_backspace_to_lctl_backspace,
     &lalt_del_to_lctl_del,
@@ -293,6 +303,17 @@ const key_override_t *key_overrides[] = {
 
 
 bool process_record_user(uint16_t keycode, keyrecord_t* record) {
+  if (record->event.pressed) {
+    if (gui_ent_pressed && keycode != GUI_ENT && keycode != CTL_SPC && !gui_ent_registered) {
+      register_code(KC_LGUI);
+      gui_ent_registered = true;
+    }
+    if (ctl_spc_pressed && keycode != CTL_SPC && !ctl_spc_registered) {
+      register_code(KC_LCTL);
+      ctl_spc_registered = true;
+    }
+  }
+
   switch (keycode) {
     case HYPR_TAB:
       if (record->event.pressed && (alt_tab_active || (get_mods() & MOD_MASK_GUI))) {
@@ -308,10 +329,58 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
       break;
 
     case GUI_ENT:
-      if (!record->event.pressed) {
+      if (record->event.pressed) {
+        if (ctl_spc_pressed) {
+          tap_code16(C(KC_ENT));
+          gui_ent_ctrl_enter_sent = true;
+          return false;
+        }
+        gui_ent_pressed = true;
+        gui_ent_registered = false;
+        gui_ent_search_sent = false;
+        gui_ent_timer = timer_read();
+      } else {
+        if (gui_ent_ctrl_enter_sent) {
+          gui_ent_ctrl_enter_sent = false;
+          return false;
+        }
+        if (gui_ent_registered) {
+          unregister_code(KC_LGUI);
+        } else if (!gui_ent_search_sent && timer_elapsed(gui_ent_timer) < TAPPING_TERM) {
+          tap_code(KC_ENT);
+        }
+        gui_ent_pressed = false;
+        gui_ent_registered = false;
+        gui_ent_search_sent = false;
         release_alt_tab();
       }
-      break;
+      return false;
+
+    case CTL_SPC:
+      if (record->event.pressed) {
+        if (gui_ent_pressed) {
+          tap_code(KC_LGUI);
+          gui_ent_search_sent = true;
+          ctl_spc_search_sent = true;
+          return false;
+        }
+        ctl_spc_pressed = true;
+        ctl_spc_registered = false;
+        ctl_spc_timer = timer_read();
+      } else {
+        if (ctl_spc_search_sent) {
+          ctl_spc_search_sent = false;
+          return false;
+        }
+        if (ctl_spc_registered) {
+          unregister_code(KC_LCTL);
+        } else if (timer_elapsed(ctl_spc_timer) < TAPPING_TERM) {
+          tap_code(KC_SPACE);
+        }
+        ctl_spc_pressed = false;
+        ctl_spc_registered = false;
+      }
+      return false;
 
     case LT_REP:  // NAV layer on hold, Repeat Key on tap.
       if (record->tap.count) {  // On tap.
@@ -401,7 +470,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         HYPR_TAB,                KC_Q,       KC_W,       KC_F,       KC_P,       KC_B,                                  KC_J,           KC_L,        KC_U,        KC_Z,        KC_RBRC,     KC_NUHS,
         MT(MOD_LSFT, KC_ESC),    KC_A,       KC_R,       KC_S,       KC_T,       KC_G,                                  KC_M,           KC_N,        KC_E,        KC_I,        KC_O,        KC_RSFT,
         KC_LCTL,                 KC_Y,       KC_X,       KC_C,       KC_D,       KC_V,                                  KC_K,           KC_H,        KC_COMM,     KC_DOT,      KC_SLSH,     KC_NUBS,
-                                               MT(MOD_LALT, KC_DEL),    LT_REP,  GUI_ENT,                   KC_SPACE,  LT(MO(_UPPER), KC_BSPC),     KC_RALT
+                                               MT(MOD_LALT, KC_DEL),    LT_REP,  GUI_ENT,                   CTL_SPC,  LT(MO(_UPPER), KC_BSPC),     KC_RALT
     ),
 
     [_LOWER] = LAYOUT_split_3x6_3(
