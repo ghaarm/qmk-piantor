@@ -67,6 +67,7 @@ void process_combo_event(uint16_t combo_index, bool pressed) {
 }
 void leader_end_user(void) {
     if (leader_sequence_one_key(KC_S)) {
+    }
     // } else if (leader_sequence_three_keys(KC_A, KC_R, KC_B)) {
     //     SEND_STRING("arbeit@example.com");
     // }
@@ -533,7 +534,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         HYPR_TAB,                KC_Q,       KC_W,       KC_F,       KC_P,       KC_B,                                  KC_J,           KC_L,        KC_U,        KC_Z,        KC_RBRC,     KC_NUHS,
         MT(MOD_LSFT, KC_ESC),    KC_A,       KC_R,       KC_S,       KC_T,       KC_G,                                  KC_M,           KC_N,        KC_E,        KC_I,        KC_O,        KC_RSFT,
         KC_LCTL,                 KC_Y,       KC_X,       KC_C,       KC_D,       KC_V,                                  KC_K,           KC_H,        KC_COMM,     KC_DOT,      KC_SLSH,     KC_NUBS,
-                                               MT(MOD_LALT, KC_DEL),    LT_REP,  GUI_ENT,                   CTL_SPC,  LT(MO(_UPPER), KC_BSPC),     KC_RALT
+                                         MT(MOD_LALT, LT_REP),    LT(MO(_LOWER), KC_DEL),  GUI_ENT,                   CTL_SPC,  LT(MO(_UPPER), KC_BSPC),     KC_RALT
     ),
 
     [_LOWER] = LAYOUT_split_3x6_3(
