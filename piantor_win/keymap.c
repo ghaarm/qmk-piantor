@@ -74,7 +74,19 @@ const key_override_t alt_o_to_oe = ko_make_basic(MOD_MASK_ALT, KC_O, DE_UDIA);
 const key_override_t alt_u_to_ue = ko_make_basic(MOD_MASK_ALT, KC_U, DE_UDIA);
 const key_override_t alt_s_to_ss = ko_make_basic(MOD_MASK_ALT, KC_S, DE_SS);
 
-
+// Key Override für Windows allgemein
+const key_override_t hyper_del_to_ctrl_shift_enter = {
+    .trigger_mods      = MOD_MASK_HYPR,
+    .layers            = ~0,
+    .negative_mod_mask = 0,
+    .suppressed_mods   = MOD_MASK_HYPR,
+    .options           = ko_options_default,
+    .trigger           = KC_DEL,
+    .replacement       = C(S(KC_ENT)),
+    .custom_action     = NULL,
+    .context           = NULL,
+    .enabled           = NULL,
+};
 
 // Key Override für Windows LGUI
 const key_override_t lgui_a_to_lctl_a = ko_make_basic(MOD_MASK_GUI, KC_A, C(KC_A));
@@ -86,6 +98,117 @@ const key_override_t lgui_x_to_lctl_x = ko_make_basic(MOD_MASK_GUI, KC_X, C(KC_X
 const key_override_t lgui_z_to_lctl_z = ko_make_basic(MOD_MASK_GUI, KC_Z, C(KC_Z));
 
 
+// Key Override für Windows Navigation
+const key_override_t lalt_shift_f_to_lgui_up = {
+    .trigger_mods    = MOD_BIT(KC_LALT) | MOD_BIT(KC_LSFT),
+    .layers          = ~0,
+    .negative_mod_mask = 0,
+    .suppressed_mods = MOD_BIT(KC_LALT) | MOD_BIT(KC_LSFT),
+    .options         = ko_options_default,
+    .trigger         = KC_F,
+    .replacement     = LGUI(KC_UP),
+    .custom_action   = NULL,
+    .context         = NULL,
+    .enabled         = NULL,
+};
+const key_override_t lalt_shift_f_to_lgui_right = {
+    .trigger_mods    = MOD_BIT(KC_LALT) | MOD_BIT(KC_LSFT),
+    .layers          = ~0,
+    .negative_mod_mask = 0,
+    .suppressed_mods = MOD_BIT(KC_LALT) | MOD_BIT(KC_LSFT),
+    .options         = ko_options_default,
+    .trigger         = KC_P,
+    .replacement     = LGUI(KC_RGHT),
+    .custom_action   = NULL,
+    .context         = NULL,
+    .enabled         = NULL,
+};
+const key_override_t lalt_shift_f_to_lgui_left = {
+    .trigger_mods    = MOD_BIT(KC_LALT) | MOD_BIT(KC_LSFT),
+    .layers          = ~0,
+    .negative_mod_mask = 0,
+    .suppressed_mods = MOD_BIT(KC_LALT) | MOD_BIT(KC_LSFT),
+    .options         = ko_options_default,
+    .trigger         = KC_W,
+    .replacement     = LGUI(KC_LEFT),
+    .custom_action   = NULL,
+    .context         = NULL,
+    .enabled         = NULL,
+};
+
+
+const key_override_t lalt_q_to_lgui_1 = {
+    .trigger_mods    = MOD_BIT(KC_LALT),
+    .layers          = ~0,
+    .negative_mod_mask = 0,
+    .suppressed_mods = MOD_BIT(KC_LALT),
+    .options         = ko_options_default,
+    .trigger         = KC_Q,
+    .replacement     = LGUI(KC_1),
+    .custom_action   = NULL,
+    .context         = NULL,
+    .enabled         = NULL,
+};
+const key_override_t lalt_w_to_lgui_2 = {
+    .trigger_mods    = MOD_BIT(KC_LALT),
+    .layers          = ~0,
+    .negative_mod_mask = 0,
+    .suppressed_mods = MOD_BIT(KC_LALT),
+    .options         = ko_options_default,
+    .trigger         = KC_W,
+    .replacement     = LGUI(KC_2),
+    .custom_action   = NULL,
+    .context         = NULL,
+    .enabled         = NULL,
+};
+const key_override_t lalt_f_to_lgui_3 = {
+    .trigger_mods    = MOD_BIT(KC_LALT),
+    .layers          = ~0,
+    .negative_mod_mask = 0,
+    .suppressed_mods = MOD_BIT(KC_LALT),
+    .options         = ko_options_default,
+    .trigger         = KC_F,
+    .replacement     = LGUI(KC_3),
+    .custom_action   = NULL,
+    .context         = NULL,
+    .enabled         = NULL,
+};
+const key_override_t lalt_q_to_lgui_4 = {
+    .trigger_mods    = MOD_BIT(KC_LALT),
+    .layers          = ~0,
+    .negative_mod_mask = 0,
+    .suppressed_mods = MOD_BIT(KC_LALT),
+    .options         = ko_options_default,
+    .trigger         = KC_Q,
+    .replacement     = LGUI(KC_1),
+    .custom_action   = NULL,
+    .context         = NULL,
+    .enabled         = NULL,
+};
+const key_override_t lalt_p_to_lgui_4 = {
+    .trigger_mods    = MOD_BIT(KC_LALT),
+    .layers          = ~0,
+    .negative_mod_mask = 0,
+    .suppressed_mods = MOD_BIT(KC_LALT),
+    .options         = ko_options_default,
+    .trigger         = KC_P,
+    .replacement     = LGUI(KC_1),
+    .custom_action   = NULL,
+    .context         = NULL,
+    .enabled         = NULL,
+};
+const key_override_t lalt_b_to_lgui_5 = {
+    .trigger_mods    = MOD_BIT(KC_LALT),
+    .layers          = ~0,
+    .negative_mod_mask = 0,
+    .suppressed_mods = MOD_BIT(KC_LALT),
+    .options         = ko_options_default,
+    .trigger         = KC_B,
+    .replacement     = LGUI(KC_5),
+    .custom_action   = NULL,
+    .context         = NULL,
+    .enabled         = NULL,
+};
 
 const key_override_t lalt_backspace_to_lctl_backspace = ko_make_basic(MOD_BIT(KC_LALT), KC_BSPC, C(KC_BSPC));
 
@@ -220,7 +343,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                                         _______,     _______,    _______,                    _______, _______, _______
     ),
     [_UPPER] = LAYOUT_split_3x6_3(
-        KC_NO,      KC_NO,       KC_NO,       KC_NO,        KC_NO,       QK_REP,                               KC_NO,         KC_MPRV,             KC_COMM,           KC_DOT,    KC_NO,      QK_BOOT,
+        KC_NO,      KC_NO,       KC_NO,       KC_NO,        LGUI(LSFT(KC_S)),       QK_REP,                               KC_NO,         KC_MPRV,             KC_COMM,           KC_DOT,    KC_NO,      QK_BOOT,
          _______,   KC_NO,       KC_NO,       KC_NO,        KC_NO,       KC_NO,                                KC_LEFT,       KC_DOWN,             KC_UP,             KC_RGHT,   KC_NO,      KC_NO,
          _______,   KC_NO,       KC_NO,       KC_NO,        KC_NO,       KC_NO,                                KC_HOME,       KC_PAGE_DOWN,        KC_PAGE_UP,        KC_END,    KC_MNXT,    KC_MPLY,
 
