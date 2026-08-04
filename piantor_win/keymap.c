@@ -121,6 +121,41 @@ static bool ctl_spc_registered = false;
 static bool ctl_spc_search_sent = false;
 static uint16_t ctl_spc_timer = 0;
 
+static void tap_ctrl_shortcut(uint16_t keycode) {
+    tap_code16(C(keycode));
+}
+
+static bool handle_gui_ent_chord(uint16_t keycode) {
+    switch (keycode) {
+        case KC_A:
+        case KC_C:
+        case KC_F:
+        case KC_S:
+        case KC_V:
+        case KC_X:
+        case KC_Z:
+            tap_ctrl_shortcut(keycode);
+            gui_ent_search_sent = true;
+            return false;
+        case KC_W:
+            tap_code16(A(KC_F4));
+            gui_ent_search_sent = true;
+            return false;
+        case KC_BSPC:
+            delete_line_to_start(true, NULL);
+            gui_ent_search_sent = true;
+            return false;
+        default:
+            register_code(KC_LGUI);
+            gui_ent_registered = true;
+            return true;
+    }
+}
+
+static void tap_windows_search(void) {
+    tap_code16(G(KC_S));
+}
+
 static void release_alt_tab(void) {
     if (alt_tab_active) {
         unregister_code(KC_LALT);
@@ -305,10 +340,8 @@ const key_override_t *key_overrides[] = {
 bool process_record_user(uint16_t keycode, keyrecord_t* record) {
   if (record->event.pressed) {
     if (gui_ent_pressed && keycode != GUI_ENT && keycode != CTL_SPC && !gui_ent_registered) {
-      register_code(KC_LGUI);
-      gui_ent_registered = true;
-    }
-    if (ctl_spc_pressed && keycode != CTL_SPC && !ctl_spc_registered) {
+      return handle_gui_ent_chord(keycode);
+    } else if (ctl_spc_pressed && keycode != GUI_ENT && keycode != CTL_SPC && !ctl_spc_registered) {
       register_code(KC_LCTL);
       ctl_spc_registered = true;
     }
@@ -359,7 +392,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
     case CTL_SPC:
       if (record->event.pressed) {
         if (gui_ent_pressed) {
-          tap_code(KC_LGUI);
+          tap_windows_search();
           gui_ent_search_sent = true;
           ctl_spc_search_sent = true;
           return false;
