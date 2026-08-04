@@ -73,6 +73,8 @@ void leader_end_user(void) {
     // }
 }
 
+#define HYPR_TAB LT(MO(_HYPR), KC_TAB)
+#define GUI_ENT MT(MOD_LGUI, KC_ENT)
 #define LT_REP LT(_LOWER, KC_0)
 // Use `LT_REP` in your layout...
 // https://getreuer.info/posts/keyboards/faqs/index.html#layer-tap-repeat-key
@@ -90,10 +92,10 @@ const key_override_t alt_s_to_ss = ko_make_basic(MOD_MASK_ALT, KC_S, DE_SS);
 
 // Key Override für Windows allgemein
 const key_override_t hyper_del_to_ctrl_shift_enter = {
-    .trigger_mods      = MOD_MASK_HYPR,
+    .trigger_mods      = MOD_MASK_CTRL | MOD_MASK_SHIFT | MOD_MASK_ALT | MOD_MASK_GUI,
     .layers            = ~0,
     .negative_mod_mask = 0,
-    .suppressed_mods   = MOD_MASK_HYPR,
+    .suppressed_mods   = MOD_MASK_CTRL | MOD_MASK_SHIFT | MOD_MASK_ALT | MOD_MASK_GUI,
     .options           = ko_options_default,
     .trigger           = KC_DEL,
     .replacement       = C(S(KC_ENT)),
@@ -101,6 +103,23 @@ const key_override_t hyper_del_to_ctrl_shift_enter = {
     .context           = NULL,
     .enabled           = NULL,
 };
+
+bool delete_line_to_start(bool activated, void *context) {
+    if (activated) {
+        tap_code16(S(KC_HOME));
+        tap_code(KC_BSPC);
+    }
+    return false;
+}
+
+static bool alt_tab_active = false;
+
+static void release_alt_tab(void) {
+    if (alt_tab_active) {
+        unregister_code(KC_LALT);
+        alt_tab_active = false;
+    }
+}
 
 // Key Override für Windows LGUI
 const key_override_t lgui_a_to_lctl_a = ko_make_basic(MOD_MASK_GUI, KC_A, C(KC_A));
@@ -213,10 +232,24 @@ const key_override_t lalt_b_to_lgui_5 = {
 };
 
 const key_override_t lalt_backspace_to_lctl_backspace = ko_make_basic(MOD_BIT(KC_LALT), KC_BSPC, C(KC_BSPC));
+const key_override_t lalt_del_to_lctl_del = ko_make_basic(MOD_BIT(KC_LALT), KC_DEL, C(KC_DEL));
 
 const key_override_t lshift_lgui_space_to_lctl_enter = ko_make_basic(MOD_MASK_SHIFT | MOD_MASK_GUI, KC_SPACE, C(KC_ENT));
 
 const key_override_t lgui_w_to_lalt_f4 = ko_make_basic(MOD_MASK_GUI, KC_W, A(KC_F4));
+
+const key_override_t lgui_backspace_to_delete_line_to_start = {
+    .trigger_mods      = MOD_BIT(KC_LGUI),
+    .layers            = ~0,
+    .negative_mod_mask = 0,
+    .suppressed_mods   = MOD_BIT(KC_LGUI),
+    .options           = ko_options_default,
+    .trigger           = KC_BSPC,
+    .replacement       = KC_NO,
+    .custom_action     = delete_line_to_start,
+    .context           = NULL,
+    .enabled           = NULL,
+};
 
 
 // Array von Key Overrides
@@ -249,16 +282,37 @@ const key_override_t *key_overrides[] = {
     &lalt_b_to_lgui_5,
 
     &lalt_backspace_to_lctl_backspace,
+    &lalt_del_to_lctl_del,
 
     &lshift_lgui_space_to_lctl_enter,
 
     &lgui_w_to_lalt_f4,  // Neuer Key Override
+    &lgui_backspace_to_delete_line_to_start,
     NULL // Array muss mit NULL enden
 };
 
 
 bool process_record_user(uint16_t keycode, keyrecord_t* record) {
   switch (keycode) {
+    case HYPR_TAB:
+      if (record->event.pressed && (alt_tab_active || (get_mods() & MOD_MASK_GUI))) {
+        del_mods(MOD_MASK_GUI);
+        register_code(KC_LALT);
+        tap_code(KC_TAB);
+        alt_tab_active = true;
+        return false;
+      }
+      if (!record->event.pressed && alt_tab_active) {
+        return false;
+      }
+      break;
+
+    case GUI_ENT:
+      if (!record->event.pressed) {
+        release_alt_tab();
+      }
+      break;
+
     case LT_REP:  // NAV layer on hold, Repeat Key on tap.
       if (record->tap.count) {  // On tap.
         repeat_key_invoke(&record->event);  // Repeat the last key.
@@ -344,10 +398,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_BASE] = LAYOUT_split_3x6_3(
-        LT(MO(_HYPR), KC_TAB),   KC_Q,       KC_W,       KC_F,       KC_P,       KC_B,                                  KC_J,           KC_L,        KC_U,        KC_Z,        KC_RBRC,     KC_NUHS,
+        HYPR_TAB,                KC_Q,       KC_W,       KC_F,       KC_P,       KC_B,                                  KC_J,           KC_L,        KC_U,        KC_Z,        KC_RBRC,     KC_NUHS,
         MT(MOD_LSFT, KC_ESC),    KC_A,       KC_R,       KC_S,       KC_T,       KC_G,                                  KC_M,           KC_N,        KC_E,        KC_I,        KC_O,        KC_RSFT,
         KC_LCTL,                 KC_Y,       KC_X,       KC_C,       KC_D,       KC_V,                                  KC_K,           KC_H,        KC_COMM,     KC_DOT,      KC_SLSH,     KC_NUBS,
-                                               MT(MOD_LALT, KC_DEL),    LT_REP,  MT(MOD_LGUI, KC_ENT),       KC_SPACE,  LT(MO(_UPPER), KC_BSPC),     KC_RALT
+                                               MT(MOD_LALT, KC_DEL),    LT_REP,  GUI_ENT,                   KC_SPACE,  LT(MO(_UPPER), KC_BSPC),     KC_RALT
     ),
 
     [_LOWER] = LAYOUT_split_3x6_3(
@@ -372,4 +426,3 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     )
 };
-
