@@ -23,6 +23,7 @@ enum layers {
 enum combo_events {
   EM_EMAIL,
   BSPC_LSFT_CLEAR,
+  XC_LEADER, // damit xc den leader aktiviert
 };
 
 bool get_combo_must_tap(uint16_t combo_index, combo_t *combo) {
@@ -36,10 +37,12 @@ bool get_combo_must_tap(uint16_t combo_index, combo_t *combo) {
 }
 const uint16_t PROGMEM email_combo[] = {KC_Q, KC_W, COMBO_END};
 const uint16_t PROGMEM clear_line_combo[] = {MT(MOD_LGUI, KC_ENT), LT(MO(_UPPER), KC_BSPC), COMBO_END};
+const uint16_t PROGMEM xc_leader_combo[] = { KC_X, KC_C, COMBO_END };
 
 combo_t key_combos[] = {
   [EM_EMAIL] = COMBO_ACTION(email_combo),
   [BSPC_LSFT_CLEAR] = COMBO_ACTION(clear_line_combo),
+    [XC_LEADER] = COMBO(xc_leader_combo, QK_LEAD),
 };
 
 void process_combo_event(uint16_t combo_index, bool pressed) {
@@ -57,7 +60,18 @@ void process_combo_event(uint16_t combo_index, bool pressed) {
       break;
   }
 }
-
+void leader_end_user(void) {
+    if (leader_sequence_one_key(KC_S)) {
+        SEND_STRING("S123");
+    } else if (leader_sequence_one_key(KC_T)) {
+        SEND_STRING("T1234");
+    } else if (leader_sequence_one_key(KC_G)) {
+        SEND_STRING("G134");
+    }
+    // } else if (leader_sequence_three_keys(KC_A, KC_R, KC_B)) {
+    //     SEND_STRING("arbeit@example.com");
+    // }
+}
 
 #define LT_REP LT(_LOWER, KC_0)
 // Use `LT_REP` in your layout...
@@ -70,7 +84,7 @@ bool remember_last_key_user(uint16_t keycode, keyrecord_t* record,
 
 // Key Override für Morph Umlaute
 const key_override_t alt_a_to_ae = ko_make_basic(MOD_MASK_ALT, KC_A, DE_ADIA);
-const key_override_t alt_o_to_oe = ko_make_basic(MOD_MASK_ALT, KC_O, DE_UDIA);
+const key_override_t alt_o_to_oe = ko_make_basic(MOD_MASK_ALT, KC_O, DE_ODIA);
 const key_override_t alt_u_to_ue = ko_make_basic(MOD_MASK_ALT, KC_U, DE_UDIA);
 const key_override_t alt_s_to_ss = ko_make_basic(MOD_MASK_ALT, KC_S, DE_SS);
 
@@ -173,18 +187,6 @@ const key_override_t lalt_f_to_lgui_3 = {
     .context         = NULL,
     .enabled         = NULL,
 };
-const key_override_t lalt_q_to_lgui_4 = {
-    .trigger_mods    = MOD_BIT(KC_LALT),
-    .layers          = ~0,
-    .negative_mod_mask = 0,
-    .suppressed_mods = MOD_BIT(KC_LALT),
-    .options         = ko_options_default,
-    .trigger         = KC_Q,
-    .replacement     = LGUI(KC_1),
-    .custom_action   = NULL,
-    .context         = NULL,
-    .enabled         = NULL,
-};
 const key_override_t lalt_p_to_lgui_4 = {
     .trigger_mods    = MOD_BIT(KC_LALT),
     .layers          = ~0,
@@ -192,7 +194,7 @@ const key_override_t lalt_p_to_lgui_4 = {
     .suppressed_mods = MOD_BIT(KC_LALT),
     .options         = ko_options_default,
     .trigger         = KC_P,
-    .replacement     = LGUI(KC_1),
+    .replacement     = LGUI(KC_4),
     .custom_action   = NULL,
     .context         = NULL,
     .enabled         = NULL,
@@ -226,6 +228,8 @@ const key_override_t *key_overrides[] = {
     &alt_s_to_ss,
 
     // Key Override für Windows
+    &hyper_del_to_ctrl_shift_enter,
+
     &lgui_a_to_lctl_a,
     &lgui_c_to_lctl_c,
     &lgui_f_to_lctl_f,
@@ -233,6 +237,16 @@ const key_override_t *key_overrides[] = {
     &lgui_v_to_lctl_v,
     &lgui_x_to_lctl_x,
     &lgui_z_to_lctl_z,
+
+    // Key Override für Windows Navigation
+    &lalt_shift_f_to_lgui_up,
+    &lalt_shift_f_to_lgui_right,
+    &lalt_shift_f_to_lgui_left,
+    &lalt_q_to_lgui_1,
+    &lalt_w_to_lgui_2,
+    &lalt_f_to_lgui_3,
+    &lalt_p_to_lgui_4,
+    &lalt_b_to_lgui_5,
 
     &lalt_backspace_to_lctl_backspace,
 
@@ -358,5 +372,4 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     )
 };
-
 
