@@ -67,6 +67,7 @@ void process_combo_event(uint16_t combo_index, bool pressed) {
 }
 void leader_end_user(void) {
     if (leader_sequence_one_key(KC_S)) {
+    }
     // } else if (leader_sequence_three_keys(KC_A, KC_R, KC_B)) {
     //     SEND_STRING("arbeit@example.com");
     // }
@@ -170,6 +171,7 @@ static void release_alt_tab(void) {
 const key_override_t lgui_a_to_lctl_a = ko_make_basic(MOD_MASK_GUI, KC_A, C(KC_A));
 const key_override_t lgui_c_to_lctl_c = ko_make_basic(MOD_MASK_GUI, KC_C, C(KC_C));
 const key_override_t lgui_f_to_lctl_f = ko_make_basic(MOD_MASK_GUI, KC_F, C(KC_F));
+const key_override_t lgui_p_to_lctl_p = ko_make_basic(MOD_MASK_GUI, KC_P, C(KC_P));
 const key_override_t lgui_s_to_lctl_s = ko_make_basic(MOD_MASK_GUI, KC_S, C(KC_S));
 const key_override_t lgui_v_to_lctl_v = ko_make_basic(MOD_MASK_GUI, KC_V, C(KC_V));
 const key_override_t lgui_x_to_lctl_x = ko_make_basic(MOD_MASK_GUI, KC_X, C(KC_X));
@@ -339,6 +341,7 @@ const key_override_t *key_overrides[] = {
     &lgui_a_to_lctl_a,
     &lgui_c_to_lctl_c,
     &lgui_f_to_lctl_f,
+    &lgui_p_to_lctl_p,
     &lgui_s_to_lctl_s,
     &lgui_v_to_lctl_v,
     &lgui_x_to_lctl_x,
@@ -534,7 +537,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         HYPR_TAB,                KC_Q,       KC_W,       KC_F,       KC_P,       KC_B,                                  KC_J,           KC_L,        KC_U,        KC_Z,        KC_RBRC,     KC_NUHS,
         MT(MOD_LSFT, KC_ESC),    KC_A,       KC_R,       KC_S,       KC_T,       KC_G,                                  KC_M,           KC_N,        KC_E,        KC_I,        KC_O,        KC_RSFT,
         KC_LCTL,                 KC_Y,       KC_X,       KC_C,       KC_D,       KC_V,                                  KC_K,           KC_H,        KC_COMM,     KC_DOT,      KC_SLSH,     KC_NUBS,
-                                         ALT_REP,    LT(MO(_LOWER), KC_DEL),  GUI_ENT,                   CTL_SPC,  LT(MO(_UPPER), KC_BSPC),     KC_RALT
+                                         ALT_REP,    LT(_LOWER, KC_DEL),  GUI_ENT,                   CTL_SPC,  LT(MO(_UPPER), KC_BSPC),     KC_RALT
     ),
 
     [_LOWER] = LAYOUT_split_3x6_3(
